@@ -63,7 +63,7 @@ jobs:
       - name: Clear Composer Cache
         run: composer clear-cache
       - name: Install Dependencies
-        run: COMPOSER_MEMORY_LIMIT=-1 composer install --prefer-dist --no-progress --no-scripts
+        run: COMPOSER_MEMORY_LIMIT=-1 composer install --prefer-dist --no-progress --no-scripts -vvv
       - name: Run Test Cases
         run: |
           vendor/bin/php-cs-fixer fix --dry-run
