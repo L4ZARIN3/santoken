@@ -10,6 +10,7 @@ use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Contract\ConfigInterface;
 use Hyperf\Carbon\Carbon;
 use Psr\Log\LoggerInterface;
+use Lazarini\HyperfSantoken\Contracts\TokenDriverInterface;
 
 class AuthManager
 {
