@@ -62,7 +62,7 @@ class ConfigProvider
                 [
                     'id' => 'config',
                     'description' => 'The configuration file for Hyperf Auth.',
-                    'source' => __DIR__ . '/../publish/config/santoken.php',
+                    'source' => __DIR__ . '/../publish/Config/santoken.php',
                     'destination' => BASE_PATH . '/config/autoload/santoken.php',
                 ],
                 [
