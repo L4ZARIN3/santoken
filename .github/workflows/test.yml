@@ -14,7 +14,7 @@ jobs:
       matrix:
         os: [ ubuntu-latest ]
         php-version: ['8.3']
-        engine: [ 'none', 'swoole', 'swow' ]
+        engine: [ 'swoole', 'swow' ]
       max-parallel: 9
     steps:
       - name: Checkout
@@ -60,6 +60,8 @@ jobs:
           sudo sh -c "echo extension=swow > /etc/php/${{ matrix.php-version }}/cli/conf.d/swow.ini"
           php --ri swow
 
+      - name: Install Dependencies
+        run: COMPOSER_MEMORY_LIMIT=-1 composer install --prefer-dist --no-progress --no-scripts
       - name: Clear Composer Cache
         run: composer clear-cache
       - name: Install Dependencies
