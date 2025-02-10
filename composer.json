@@ -17,7 +17,7 @@
             "HyperfTest\\": "tests"
         },
         "files": [
-            "app/Helper/SanTokenHelper.php"
+            "src/Helper/SanTokenHelper.php"
         ]
     },
     "require": {
