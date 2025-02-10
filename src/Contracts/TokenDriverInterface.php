@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace BrunoLazarini\HyperfAuth;
+namespace Lazarini\HyperfSantoken\Contracts;
 
 interface TokenDriverInterface
 {

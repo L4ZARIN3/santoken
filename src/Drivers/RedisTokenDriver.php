@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
-namespace BrunoLazarini\HyperfAuth;
+namespace Lazarini\HyperfSantoken\Drivers;
 
 use Hyperf\Redis\Redis;
+use Lazarini\HyperfSantoken\Contracts\TokenDriverInterface;
 
 class RedisTokenDriver implements TokenDriverInterface
 {
