@@ -9,10 +9,10 @@ env:
 jobs:
   ci:
     name: Test PHP ${{ matrix.php-version }} on ${{ matrix.engine }}
-    runs-on: "${{ matrix.os }}"
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
-        os: [ ubuntu-latest ]
+        os: [ ubuntu-22.04 ]
         php-version: ['8.3']
         engine: [ 'swoole', 'swow' ]
       max-parallel: 9
@@ -62,8 +62,14 @@ jobs:
 
       - name: Clear Composer Cache
         run: composer clear-cache
+      - name: Reinstall Composer
+        run: sudo rm -rf /usr/local/bin/composer && curl -sS https://getcomposer.org/installer | php && sudo mv composer.phar /usr/local/bin/composer
+      - name: Disable Composer Plugins
+        run: composer global config --no-plugins
+      - name: Update Dependencies
+        run: COMPOSER_MEMORY_LIMIT=-1 composer update --prefer-dist --no-progress --no-scripts
       - name: Install Dependencies
-        run: COMPOSER_MEMORY_LIMIT=-1 composer install --prefer-dist --no-progress --no-scripts -vvv
+        run: COMPOSER_MEMORY_LIMIT=-1 composer install --prefer-source --no-progress --no-scripts
       - name: Run Test Cases
         run: |
           vendor/bin/php-cs-fixer fix --dry-run
