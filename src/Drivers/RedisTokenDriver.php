@@ -1,6 +1,14 @@
 <?php
 
 declare(strict_types=1);
+/**
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
+ */
 
 namespace Lazarini\HyperfSantoken\Drivers;
 
@@ -10,6 +18,7 @@ use Lazarini\HyperfSantoken\Contracts\TokenDriverInterface;
 class RedisTokenDriver implements TokenDriverInterface
 {
     private Redis $redis;
+
     private string $prefix;
 
     public function __construct(Redis $redis, string $prefix)
@@ -21,7 +30,7 @@ class RedisTokenDriver implements TokenDriverInterface
     public function create(string $token, array $data): void
     {
         $this->redis->set($this->prefix . "tokens:{$token}", json_encode($data));
-        $this->redis->sAdd($this->prefix ."user_tokens:{$data['user_id']}", $token);
+        $this->redis->sAdd($this->prefix . "user_tokens:{$data['user_id']}", $token);
     }
 
     public function check(string $token): ?array

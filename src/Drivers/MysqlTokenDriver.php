@@ -1,6 +1,14 @@
 <?php
 
 declare(strict_types=1);
+/**
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
+ */
 
 namespace Lazarini\HyperfSantoken\Drivers;
 
@@ -19,9 +27,9 @@ class MysqlTokenDriver implements TokenDriverInterface
     public function create(string $token, array $data): void
     {
         $this->db->connection()->table('auth_tokens')->insert([
-            'token'      => $token,
-            'user_id'    => $data['user_id'],
-            'abilities'  => json_encode($data['abilities']),
+            'token' => $token,
+            'user_id' => $data['user_id'],
+            'abilities' => json_encode($data['abilities']),
             'created_at' => $data['created_at'],
         ]);
     }
@@ -40,6 +48,11 @@ class MysqlTokenDriver implements TokenDriverInterface
             ->update(['abilities' => json_encode($data['abilities'])]);
     }
 
-    public function destroyUserCurrentToken(string $token): void {}
-    public function destroyAllUserTokens(string $token): void {}
+    public function destroyUserCurrentToken(string $token): void
+    {
+    }
+
+    public function destroyAllUserTokens(string $token): void
+    {
+    }
 }

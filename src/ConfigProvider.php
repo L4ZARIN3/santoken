@@ -9,22 +9,26 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace Lazarini\HyperfSantoken;
 
-
-use Psr\Container\ContainerInterface;
 use Hyperf\Contract\ConfigInterface;
-use Hyperf\Redis\Redis;
 use Hyperf\Database\ConnectionResolverInterface;
-use Psr\Log\LoggerInterface;
+use Hyperf\Redis\Redis;
 use Lazarini\HyperfSantoken\Contracts\TokenDriverInterface;
 use Lazarini\HyperfSantoken\Drivers\MysqlTokenDriver;
 use Lazarini\HyperfSantoken\Drivers\RedisTokenDriver;
+use Psr\Container\ContainerInterface;
+use Psr\Log\LoggerInterface;
 
 class ConfigProvider
 {
     public function __invoke(): array
     {
+        if (file_exists(BASE_PATH . '/app/Helper/SanTokenHelper.php')) {
+            require BASE_PATH . '/app/Helper/SanTokenHelper.php';
+        }
+
         return [
             'dependencies' => [
                 AuthManager::class => function (ContainerInterface $container) {
@@ -38,7 +42,7 @@ class ConfigProvider
                     $config = $container->get(ConfigInterface::class);
                     $driver = $config->get('auth_santoken.driver', 'mysql');
                     $prefix = $config->get('auth_santoken.redis_prefix', 'auth_');
-                    
+
                     return match ($driver) {
                         'redis' => new RedisTokenDriver($container->get(Redis::class), $prefix),
                         default => new MysqlTokenDriver($container->get(ConnectionResolverInterface::class)),
