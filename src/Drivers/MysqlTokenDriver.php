@@ -50,7 +50,11 @@ class MysqlTokenDriver implements TokenDriverInterface
             ->update(['abilities' => json_encode($data['abilities'])]);
     }
 
-    public function destroyUserCurrentToken(string $token): void {}
+    public function destroyUserCurrentToken(string $token): void
+    {
+    }
 
-    public function destroyAllUserTokens(string $token): void {}
+    public function destroyAllUserTokens(string $token): void
+    {
+    }
 }
