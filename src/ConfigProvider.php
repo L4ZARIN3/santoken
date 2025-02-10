@@ -40,8 +40,8 @@ class ConfigProvider
                 TokenDriverInterface::class => function (ContainerInterface $container) {
                     /** @var ConfigInterface $config */
                     $config = $container->get(ConfigInterface::class);
-                    $driver = $config->get('auth_santoken.driver', 'mysql');
-                    $prefix = $config->get('auth_santoken.redis_prefix', 'auth_');
+                    $driver = $config->get('santoken.driver', 'mysql');
+                    $prefix = $config->get('santoken.redis_prefix', 'auth_');
 
                     return match ($driver) {
                         'redis' => new RedisTokenDriver($container->get(Redis::class), $prefix),
