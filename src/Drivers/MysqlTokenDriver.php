@@ -36,9 +36,11 @@ class MysqlTokenDriver implements TokenDriverInterface
 
     public function check(string $token): ?array
     {
-        return $this->db->connection()->table('auth_tokens')
+        $result = $this->db->connection()->table('auth_tokens')
             ->where('token', $token)
             ->first();
+
+        return $result ? (array) $result : [];
     }
 
     public function update(string $token, array $data): void
@@ -48,11 +50,7 @@ class MysqlTokenDriver implements TokenDriverInterface
             ->update(['abilities' => json_encode($data['abilities'])]);
     }
 
-    public function destroyUserCurrentToken(string $token): void
-    {
-    }
+    public function destroyUserCurrentToken(string $token): void {}
 
-    public function destroyAllUserTokens(string $token): void
-    {
-    }
+    public function destroyAllUserTokens(string $token): void {}
 }
