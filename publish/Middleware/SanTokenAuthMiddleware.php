@@ -8,8 +8,9 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use BrunoLazarini\HyperfAuth\AuthManager;
-use App\Model\User; // Altere para seu modelo
+use Lazarini\HyperfSantoken\AuthManager;
+use App\Model\User;
+
 
 class SanTokenAuthMiddleware implements MiddlewareInterface
 {

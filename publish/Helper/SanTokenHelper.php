@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace App\Helper;
+
 use Hyperf\Context\ApplicationContext;
 use Lazarini\HyperfSantoken\AuthManager;
 use Hyperf\HttpServer\Contract\RequestInterface;
