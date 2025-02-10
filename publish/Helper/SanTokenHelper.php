@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use Hyperf\Context\ApplicationContext;
-use BrunoLazarini\HyperfAuth\AuthManager;
+use Lazarini\HyperfSantoken\AuthManager;
 use Hyperf\HttpServer\Contract\RequestInterface;
 
 if (!function_exists('auth')) {
