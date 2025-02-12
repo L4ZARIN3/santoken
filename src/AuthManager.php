@@ -15,6 +15,7 @@ namespace Lazarini\HyperfSantoken;
 use Hyperf\Carbon\Carbon;
 use Lazarini\HyperfSantoken\Contracts\TokenDriverInterface;
 use Psr\Log\LoggerInterface;
+use Hyperf\Context\Context;
 
 class AuthManager
 {
@@ -38,7 +39,7 @@ class AuthManager
         return $tokenSecret;
     }
 
-    public function check(string $token): ?array
+    public function check(string $token): array
     {
         return $this->tokenDriver->check($this->hashToken($token));
     }
@@ -77,6 +78,21 @@ class AuthManager
             $data['abilities'] = $modifier($data['abilities']);
             $this->tokenDriver->update($hashedSecret, $data);
         }
+    }
+
+    public static function user(): array
+    {
+        return Context::get('santoken_current_user');
+    }
+
+    public static function id(): array
+    {
+        return self::user()['user_id'];
+    }
+
+    public function setUser($user): void
+    {
+        Context::set('santoken_current_user', $user);
     }
 
     private function hashToken(string $token): string
