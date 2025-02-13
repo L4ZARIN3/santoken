@@ -68,8 +68,8 @@ class ConfigProvider
                 [
                     'id' => 'migrations',
                     'description' => 'The migration file for creating auth tokens table.',
-                    'source' => __DIR__ . '/../publish/Migrations/2025_02_07_000000_create_auth_tokens_table.php',
-                    'destination' => BASE_PATH . '/migrations/2025_02_07_000000_create_auth_tokens_table.php',
+                    'source' => __DIR__ . '/../publish/Migrations/santoken_table.php',
+                    'destination' => BASE_PATH . '/migrations/' . date('Y_m_d_') . mt_rand(1, 99999) . '_santoken.php',
                 ],
                 [
                     'id' => 'helpers',
