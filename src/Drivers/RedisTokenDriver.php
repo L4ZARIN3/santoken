@@ -44,7 +44,7 @@ class RedisTokenDriver implements TokenDriverInterface
         $this->redis->set($this->prefix . "tokens:{$token}", json_encode($data));
     }
 
-    public function destroyUserCurrentToken(string $token): void
+    public function destroyUserToken(string $token): void
     {
         $tokenData = $this->check($token);
 

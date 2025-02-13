@@ -1,14 +1,6 @@
 <?php
 
 declare(strict_types=1);
-/**
- * This file is part of Hyperf.
- *
- * @link     https://www.hyperf.io
- * @document https://hyperf.wiki
- * @contact  group@hyperf.io
- * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
- */
 
 namespace Lazarini\HyperfSantoken;
 
@@ -22,8 +14,7 @@ class AuthManager
     public function __construct(
         private TokenDriverInterface $tokenDriver,
         private LoggerInterface $logger
-    ) {
-    }
+    ) {}
 
     public function createToken(int $userId, array $abilities = []): string
     {
@@ -32,6 +23,7 @@ class AuthManager
 
         $this->tokenDriver->create($hashedSecret, [
             'user_id' => $userId,
+            'current_token' => $hashedSecret,
             'abilities' => $abilities,
             'created_at' => Carbon::now(),
         ]);
@@ -39,49 +31,64 @@ class AuthManager
         return $tokenSecret;
     }
 
-    public function check(string $token): array
+    public function check(string $token): ?array
     {
-        return $this->tokenDriver->check($this->hashToken($token));
+        return $this->tokenDriver->check($this->hashToken($token)) ?: null;
     }
 
     public function can(string $token, string $ability): bool
     {
-        return ($data = $this->check($token)) && in_array($ability, $data['abilities'], true);
+        $data = $this->check($token);
+        return $data !== null && in_array($ability, $data['abilities'], true);
     }
 
     public function addAbility(string $token, string $ability): void
     {
-        $this->updateAbilities($token, fn (array $abilities) => array_merge($abilities, [$ability]));
+        $this->updateAbilities($token, fn(array $abilities) => array_unique([...$abilities, $ability]));
     }
 
     public function removeAbility(string $token, string $ability): void
     {
-        $this->updateAbilities($token, fn (array $abilities) => array_values(array_diff($abilities, [$ability])));
+        $this->updateAbilities($token, fn(array $abilities) => array_values(array_diff($abilities, [$ability])));
     }
 
-    public function destroyCurrentToken(string $token): void
+    public function destroyCurrentToken(): void
     {
-        $this->tokenDriver->destroyUserCurrentToken($this->hashToken($token));
+        $this->tokenDriver->destroyUserCurrentToken(self::getCurrentToken());
     }
 
     public function extractTokenFromHeader(?string $authorizationHeader): ?string
     {
-        return ($authorizationHeader && str_starts_with($authorizationHeader, 'Bearer '))
+        return $authorizationHeader && str_starts_with($authorizationHeader, 'Bearer ')
             ? substr($authorizationHeader, 7)
             : null;
     }
 
-    public static function user(): array
+    public static function user(): ?array
     {
         return Context::get('santoken_current_user');
     }
 
-    public static function id(): array
+    public static function id(): ?int
     {
-        return self::user()['user_id'];
+        return self::user()['user_id'] ?? null;
     }
 
-    public function setUser($user): void
+    public static function getCurrentToken(): ?string
+    {
+        return self::user()['current_token'] ?? null;
+    }
+
+    public function deleteCurrentToken(): void
+    {
+        $currentToken = self::getCurrentToken();
+        if ($currentToken !== null) {
+            $this->tokenDriver->destroyUserToken($currentToken);
+            Context::set('santoken_current_user', null);
+        }
+    }
+
+    public function setUser(array $user): void
     {
         Context::set('santoken_current_user', $user);
     }
@@ -89,7 +96,9 @@ class AuthManager
     private function updateAbilities(string $token, callable $modifier): void
     {
         $hashedSecret = $this->hashToken($token);
-        if ($data = $this->check($token)) {
+        $data = $this->check($token);
+
+        if ($data !== null) {
             $data['abilities'] = $modifier($data['abilities']);
             $this->tokenDriver->update($hashedSecret, $data);
         }
