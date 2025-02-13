@@ -70,7 +70,7 @@ class AuthManager
 
     public static function user(): ?array
     {
-        return Context::get('santoken_current_user');
+        return Context::get('santoken_current_user') ?: null;
     }
 
     public static function id(): ?int
