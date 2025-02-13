@@ -21,11 +21,11 @@ class RedisTokenDriver implements TokenDriverInterface
 {
     private Redis $redis;
 
-    private string $prefix;
-
     private LoggerInterface $logger;
 
-    public function __construct(Redis $redis, string $prefix, LoggerInterface $logger)
+    private string $prefix;
+
+    public function __construct(Redis $redis, LoggerInterface $logger, string $prefix)
     {
         $this->redis = $redis;
         $this->prefix = $prefix;

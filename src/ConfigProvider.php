@@ -44,8 +44,8 @@ class ConfigProvider
                     $prefix = $config->get('santoken.redis_prefix', 'auth_');
 
                     return match ($driver) {
-                        'redis' => new RedisTokenDriver($container->get(Redis::class), $prefix),
-                        default => new MysqlTokenDriver($container->get(ConnectionResolverInterface::class)),
+                        'redis' => new RedisTokenDriver($container->get(Redis::class), $container->get(LoggerInterface::class), $prefix),
+                        default => new MysqlTokenDriver($container->get(ConnectionResolverInterface::class), $container->get(LoggerInterface::class)),
                     };
                 },
             ],
