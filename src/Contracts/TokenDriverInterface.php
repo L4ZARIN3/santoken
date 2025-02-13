@@ -20,7 +20,7 @@ interface TokenDriverInterface
 
     public function update(string $token, array $data): void;
 
-    public function destroyUserToken(string $token): void;
+    public function revokeToken(string $token): void;
 
     public function destroyAllUserTokens(string $token): void;
 }

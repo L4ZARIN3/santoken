@@ -16,6 +16,7 @@ use Hyperf\Carbon\Carbon;
 use Hyperf\Context\Context;
 use Lazarini\HyperfSantoken\Contracts\TokenDriverInterface;
 use Psr\Log\LoggerInterface;
+use Throwable;
 
 class AuthManager
 {
@@ -25,30 +26,52 @@ class AuthManager
     ) {
     }
 
-    public function createToken(int $userId, array $abilities = []): string
+    public function createToken(int $userId, array $abilities = []): ?string
     {
-        $tokenSecret = bin2hex(random_bytes(32));
-        $hashedSecret = $this->hashToken($tokenSecret);
+        try {
+            $tokenSecret = bin2hex(random_bytes(32));
+            $hashedSecret = $this->hashToken($tokenSecret);
 
-        $this->tokenDriver->create($hashedSecret, [
-            'user_id' => $userId,
-            'current_token' => $hashedSecret,
-            'abilities' => $abilities,
-            'created_at' => Carbon::now(),
-        ]);
+            $this->tokenDriver->create($hashedSecret, [
+                'user_id' => $userId,
+                'current_token' => $hashedSecret,
+                'abilities' => $abilities,
+                'created_at' => Carbon::now(),
+            ]);
 
-        return $tokenSecret;
+            return $tokenSecret;
+        } catch (Throwable $e) {
+            $this->logger->error('Failed to create token: ' . $e->getMessage(), [
+                'user_id' => $userId,
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return null;
+        }
     }
 
     public function check(string $token): ?array
     {
-        return $this->tokenDriver->check($this->hashToken($token)) ?: null;
+        try {
+            return $this->tokenDriver->check($this->hashToken($token)) ?: null;
+        } catch (Throwable $e) {
+            $this->logger->error('Failed to check token: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return null;
+        }
     }
 
     public function can(string $token, string $ability): bool
     {
-        $data = $this->check($token);
-        return $data !== null && in_array($ability, $data['abilities'], true);
+        try {
+            $data = $this->check($token);
+            return $data !== null && in_array($ability, $data['abilities'], true);
+        } catch (Throwable $e) {
+            $this->logger->error('Failed to check ability: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return false;
+        }
     }
 
     public function addAbility(string $token, string $ability): void
@@ -85,10 +108,16 @@ class AuthManager
 
     public function destroyCurrentToken(): void
     {
-        $currentToken = self::getCurrentToken();
-        if ($currentToken !== null) {
-            $this->tokenDriver->destroyUserToken($currentToken);
-            Context::set('santoken_current_user', null);
+        try {
+            $currentToken = self::getCurrentToken();
+            if ($currentToken !== null) {
+                $this->tokenDriver->revokeToken($currentToken);
+                Context::set('santoken_current_user', null);
+            }
+        } catch (Throwable $e) {
+            $this->logger->error('Failed to destroy current token: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
         }
     }
 
@@ -99,12 +128,18 @@ class AuthManager
 
     private function updateAbilities(string $token, callable $modifier): void
     {
-        $hashedSecret = $this->hashToken($token);
-        $data = $this->check($token);
+        try {
+            $hashedSecret = $this->hashToken($token);
+            $data = $this->check($token);
 
-        if ($data !== null) {
-            $data['abilities'] = $modifier($data['abilities']);
-            $this->tokenDriver->update($hashedSecret, $data);
+            if ($data !== null) {
+                $data['abilities'] = $modifier($data['abilities']);
+                $this->tokenDriver->update($hashedSecret, $data);
+            }
+        } catch (Throwable $e) {
+            $this->logger->error('Failed to update abilities: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
         }
     }
 
