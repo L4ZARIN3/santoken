@@ -1,6 +1,14 @@
 <?php
 
 declare(strict_types=1);
+/**
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
+ */
 
 namespace Lazarini\HyperfSantoken;
 
@@ -14,7 +22,8 @@ class AuthManager
     public function __construct(
         private TokenDriverInterface $tokenDriver,
         private LoggerInterface $logger
-    ) {}
+    ) {
+    }
 
     public function createToken(int $userId, array $abilities = []): string
     {
@@ -44,12 +53,12 @@ class AuthManager
 
     public function addAbility(string $token, string $ability): void
     {
-        $this->updateAbilities($token, fn(array $abilities) => array_unique([...$abilities, $ability]));
+        $this->updateAbilities($token, fn (array $abilities) => array_unique([...$abilities, $ability]));
     }
 
     public function removeAbility(string $token, string $ability): void
     {
-        $this->updateAbilities($token, fn(array $abilities) => array_values(array_diff($abilities, [$ability])));
+        $this->updateAbilities($token, fn (array $abilities) => array_values(array_diff($abilities, [$ability])));
     }
 
     public function destroyCurrentToken(): void
