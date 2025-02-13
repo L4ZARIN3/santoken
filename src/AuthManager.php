@@ -61,11 +61,6 @@ class AuthManager
         $this->updateAbilities($token, fn (array $abilities) => array_values(array_diff($abilities, [$ability])));
     }
 
-    public function destroyCurrentToken(): void
-    {
-        $this->tokenDriver->destroyUserCurrentToken(self::getCurrentToken());
-    }
-
     public function extractTokenFromHeader(?string $authorizationHeader): ?string
     {
         return $authorizationHeader && str_starts_with($authorizationHeader, 'Bearer ')
@@ -88,7 +83,7 @@ class AuthManager
         return self::user()['current_token'] ?? null;
     }
 
-    public function deleteCurrentToken(): void
+    public function destroyCurrentToken(): void
     {
         $currentToken = self::getCurrentToken();
         if ($currentToken !== null) {
